@@ -6,7 +6,7 @@ Asterisk CDR (Call Detail Record) backend that publishes call records as JSON to
 
 Every completed call in Asterisk generates a CDR. This module registers as a CDR backend and publishes each record as a JSON message to a configurable Kafka topic, replacing traditional file or database CDR storage with a real-time event stream.
 
-Each CDR is enriched with system identification fields (`EntityID` and `SystemName`) so that consumers can distinguish which Asterisk instance originated the record — essential in multi-server environments.
+Each CDR is enriched with system identification fields (`EntityID` and `SystemName`) in the JSON payload, and also sends **Kafka message headers** with metadata that consumers can read without parsing the payload — useful for routing, filtering, and observability.
 
 ### JSON Output
 
@@ -39,6 +39,25 @@ Each CDR is enriched with system identification fields (`EntityID` and `SystemNa
 `EntityID` is always present (auto-detected from the network interface MAC address, or set via `entityid` in `asterisk.conf`). `SystemName` is only included when `systemname` is configured in `asterisk.conf`.
 
 Optional fields `uniqueid` and `userfield` can be enabled in the configuration. CDR variables set via `func_cdr` are also included automatically.
+
+### Kafka Message Headers
+
+Every published CDR message includes Kafka-native headers that can be read without deserializing the JSON payload:
+
+| Header | Source | Example | Description |
+|--------|--------|---------|-------------|
+| `entity_id` | `ast_eid_default` | `"00:11:22:33:44:55"` | Identifies the Asterisk instance (multi-server). |
+| `system_name` | `ast_config_AST_SYSTEM_NAME` | `"pbx-01"` | Human-readable name. Only sent if `systemname` is configured in `asterisk.conf`. |
+| `asterisk_version` | `ast_get_version()` | `"22.2.0"` | Asterisk version string. |
+| `timestamp` | `time(NULL)` | `"1738108800"` | Unix epoch of the CDR send moment. |
+| `hostname` | `gethostname()` | `"asterisk-node-1"` | Machine hostname. Complements `system_name` in container/VM environments. |
+
+These headers allow Kafka Streams, ksqlDB, and Connect SMTs to route and filter messages without parsing the body. The `EntityID` and `SystemName` fields remain **also** in the JSON payload for backward compatibility.
+
+Verify headers with `kcat`:
+```bash
+kcat -C -b localhost:9092 -t asterisk_cdr -f 'Headers: %h\nPayload: %s\n'
+```
 
 ## Prerequisites
 
@@ -113,7 +132,8 @@ The module registers itself as a CDR backend via `ast_cdr_register()`. When Aste
 3. Appends any CDR variables from `func_cdr`
 4. Optionally adds `uniqueid` and `userfield`
 5. Serializes to a JSON string
-6. Calls `ast_kafka_produce()` to enqueue in librdkafka's internal buffer (non-blocking)
+6. Builds 5 Kafka message headers (entity_id, system_name, asterisk_version, timestamp, hostname)
+7. Calls `ast_kafka_produce_hdrs()` to enqueue in librdkafka's internal buffer (non-blocking)
 
 A cached producer (`AO2_GLOBAL_OBJ_STATIC`) avoids mutex contention on every CDR write.
 
