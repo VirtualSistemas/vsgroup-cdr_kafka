@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE docs SYSTEM "appdocsxml.dtd">
+<docs xmlns:xi="http://www.w3.org/2001/XInclude">
+        <configInfo name="cdr_kafka" language="en_US">
+                <synopsis>Kafka CDR Backend</synopsis>
+                <configFile name="cdr_kafka.conf">
+                        <configObject name="global">
+                                <synopsis>Global configuration settings</synopsis>
+                                <configOption name="loguniqueid">
+                                        <synopsis>Determines whether to log the uniqueid for calls</synopsis>
+                                        <description>
+                                                <para>Default is no.</para>
+                                        </description>
+                                </configOption>
+                                <configOption name="loguserfield">
+                                        <synopsis>Determines whether to log the user field for calls</synopsis>
+                                        <description>
+                                                <para>Default is no.</para>
+                                        </description>
+                                </configOption>
+                                <configOption name="connection">
+                                        <synopsis>Name of the connection from kafka.conf to use</synopsis>
+                                        <description>
+                                                <para>Specifies the name of the connection from kafka.conf to use</para>
+                                        </description>
+                                </configOption>
+                                <configOption name="topic">
+                                        <synopsis>Name of the topic to publish to</synopsis>
+                                        <description>
+                                                <para>Defaults to asterisk_cdr</para>
+                                        </description>
+                                </configOption>
+                        </configObject>
+                </configFile>
+        </configInfo>
+</docs>

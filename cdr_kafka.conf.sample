@@ -1,0 +1,8 @@
+;
+; cdr_kafka.conf
+;
+[global]
+;loguniqueid = no       ; log uniqueid.  Default is "no"
+;loguserfield = no      ; log user field.  Default is "no"
+;connection = my-kafka  ; Connection name in kafka.conf
+;topic = asterisk_cdr   ; Topic name to publish to; defaults to asterisk_cdr
