@@ -31,7 +31,7 @@ asterisk -rx "test execute category /cdr/kafka/"
 
 ## Architecture
 
-**Single-file module**: `cdr_kafka.c` (~520 lines) contains all production code. `test_cdr_kafka.c` (~520 lines) contains 12 unit tests.
+**Single-file module**: `cdr_kafka.c` (~525 lines) contains all production code. `test_cdr_kafka.c` (~555 lines) contains 13 unit tests.
 
 **Key patterns used**:
 - **AO2 (Asterisk Objects 2)**: Thread-safe reference-counted containers for global config (`confs`) and cached producer (`cached_producer`)
@@ -42,7 +42,7 @@ asterisk -rx "test execute category /cdr/kafka/"
 
 **Configuration options** (in `/etc/asterisk/cdr_kafka.conf`): `connection`, `topic`, `key`, `loguniqueid`, `loguserfield`
 
-**Supported CDR key fields** (for Kafka partitioning): linkedid, uniqueid, channel, dstchannel, accountcode, src, dst, dcontext, tenantid — matched case-insensitively in `cdr_get_key_value()`.
+**Supported CDR key fields** (for Kafka partitioning): linkedid, uniqueid, channel, dstchannel, accountcode, src, dst, dcontext, tenantid, peertenantid — matched case-insensitively in `cdr_get_key_value()`.
 
 ## Dependencies
 

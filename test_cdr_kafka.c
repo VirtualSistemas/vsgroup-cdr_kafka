@@ -68,6 +68,7 @@ static void build_test_cdr(struct ast_cdr *cdr)
 	ast_copy_string(cdr->linkedid, "1700000000.1", sizeof(cdr->linkedid));
 	ast_copy_string(cdr->userfield, "custom-data", sizeof(cdr->userfield));
 	ast_copy_string(cdr->tenantid, "tenant-01", sizeof(cdr->tenantid));
+	ast_copy_string(cdr->peertenantid, "tenant-02", sizeof(cdr->peertenantid));
 
 	cdr->disposition = AST_CDR_ANSWERED;
 	cdr->amaflags = AST_AMA_DOCUMENTATION;
@@ -334,6 +335,37 @@ AST_TEST_DEFINE(key_tenantid)
 	return AST_TEST_PASS;
 }
 
+AST_TEST_DEFINE(key_peertenantid)
+{
+	struct ast_cdr cdr;
+	const char *val;
+
+	switch (cmd) {
+	case TEST_INIT:
+		info->name = "key_peertenantid";
+		info->category = TEST_CATEGORY;
+		info->summary = "Key extraction for peertenantid field";
+		info->description =
+			"Verifies cdr_get_key_value() returns the correct value "
+			"for the peertenantid field.";
+		return AST_TEST_NOT_RUN;
+	case TEST_EXECUTE:
+		break;
+	}
+
+	build_test_cdr(&cdr);
+
+	val = cdr_get_key_value(&cdr, "peertenantid");
+	if (!val || strcmp(val, "tenant-02") != 0) {
+		ast_test_status_update(test,
+			"Expected 'tenant-02', got '%s'\n",
+			val ? val : "(null)");
+		return AST_TEST_FAIL;
+	}
+
+	return AST_TEST_PASS;
+}
+
 /* ---- Key edge cases ---- */
 
 AST_TEST_DEFINE(key_case_insensitive)
@@ -488,6 +520,7 @@ static int load_module(void)
 	AST_TEST_REGISTER(key_dstchannel);
 	AST_TEST_REGISTER(key_dcontext);
 	AST_TEST_REGISTER(key_tenantid);
+	AST_TEST_REGISTER(key_peertenantid);
 	AST_TEST_REGISTER(key_case_insensitive);
 	AST_TEST_REGISTER(key_empty_field);
 	AST_TEST_REGISTER(key_unknown_field);
@@ -506,6 +539,7 @@ static int unload_module(void)
 	AST_TEST_UNREGISTER(key_dstchannel);
 	AST_TEST_UNREGISTER(key_dcontext);
 	AST_TEST_UNREGISTER(key_tenantid);
+	AST_TEST_UNREGISTER(key_peertenantid);
 	AST_TEST_UNREGISTER(key_case_insensitive);
 	AST_TEST_UNREGISTER(key_empty_field);
 	AST_TEST_UNREGISTER(key_unknown_field);

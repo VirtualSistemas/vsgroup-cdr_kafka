@@ -8,5 +8,5 @@
 ;topic = asterisk_cdr   ; Topic name to publish to; defaults to asterisk_cdr
 ;key =                  ; CDR field to use as Kafka message key for partitioning.
                         ; Valid values: linkedid, uniqueid, channel, dstchannel,
-                        ; accountcode, src, dst, dcontext, tenantid.
+                        ; accountcode, src, dst, dcontext, tenantid, peertenantid.
                         ; Empty (default) means no key.

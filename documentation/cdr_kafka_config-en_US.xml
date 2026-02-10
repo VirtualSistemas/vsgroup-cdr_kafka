@@ -39,7 +39,7 @@
                                                 <para>Name of the CDR field whose value is sent as
                                                 the Kafka message key for partitioning. Valid values:
                                                 linkedid, uniqueid, channel, dstchannel, accountcode,
-                                                src, dst, dcontext, tenantid.
+                                                src, dst, dcontext, tenantid, peertenantid.
                                                 Empty (default) means no key.</para>
                                         </description>
                                 </configOption>

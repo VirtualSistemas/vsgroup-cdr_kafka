@@ -65,7 +65,7 @@
 						<para>Name of the CDR field whose value is sent as
 						the Kafka message key for partitioning. Valid values:
 						linkedid, uniqueid, channel, dstchannel, accountcode,
-						src, dst, dcontext, tenantid.
+						src, dst, dcontext, tenantid, peertenantid.
 						Empty (default) means no key.</para>
 					</description>
 				</configOption>
@@ -265,6 +265,8 @@ const char *cdr_get_key_value(struct ast_cdr *cdr, const char *field_name)
 		return cdr->dcontext;
 	} else if (!strcasecmp(field_name, "tenantid")) {
 		return cdr->tenantid;
+	} else if (!strcasecmp(field_name, "peertenantid")) {
+		return cdr->peertenantid;
 	}
 
 	return NULL;
@@ -307,8 +309,10 @@ static int kafka_cdr_log(struct ast_cdr *cdr)
 		"s: o, s: o, s: o, s: i"
 		/* billsec, disposition, accountcode, amaflags */
 		"s: i, s: s, s: s, s: s"
-		/* peeraccount, linkedid and sequence*/
-		"s: s, s: s, s: i }",
+		/* peeraccount, linkedid, sequence */
+		"s: s, s: s, s: i,"
+		/* tenantid, peertenantid */
+		"s: s, s: s }",
 
 		"clid", cdr->clid,
 		"src", cdr->src,
@@ -332,7 +336,10 @@ static int kafka_cdr_log(struct ast_cdr *cdr)
 
 		"peeraccount", cdr->peeraccount,
 		"linkedid", cdr->linkedid,
-		"sequence", cdr->sequence);
+		"sequence", cdr->sequence,
+
+		"tenantid", cdr->tenantid,
+		"peertenantid", cdr->peertenantid);
 	if (!json) {
 		ao2_cleanup(producer);
 		return -1;
